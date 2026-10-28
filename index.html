@@ -56,7 +56,7 @@ function loadTasks(){let a=[];try{a=JSON.parse(localStorage.getItem(taskKey)||'[
 function addTask(text){text=(text||'').trim();if(!text)return false;let a=[];try{a=JSON.parse(localStorage.getItem(taskKey)||'[]')}catch(e){}a.push({text,done:false});localStorage.setItem(taskKey,JSON.stringify(a));loadTasks();return true}
 async function askGemini(prompt){
  const key=($('apiKey').value||localStorage.getItem(keyKey)||'').trim();if(!key)return null;
- const url='https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flasha:generateContent?key='+encodeURIComponent(key);
+ const url='https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key='+encodeURIComponent(key);
  const prior=(()=>{try{return JSON.parse(localStorage.getItem(historyKey)||'[]').slice(-12).map(x=>({role:x.who==='user'?'user':'model',parts:[{text:x.text}]}))}catch(e){return []}})();
  const contents=prior.filter(x=>x.parts?.[0]?.text).concat([{role:'user',parts:[{text:prompt}]}]).slice(-20);
  const res=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({systemInstruction:{parts:[{text:'Você é JARVIS, assistente pessoal em português brasileiro. Seja natural, humano, prestativo, claro e honesto. Não afirme ter executado ações no celular se apenas deu instruções. Responda de forma concisa, a menos que peçam detalhes. Você não tem acesso direto a aplicativos, localização, arquivos ou internet em tempo real, a menos que o usuário forneça informações.'}]},contents,generationConfig:{temperature:0.7,maxOutputTokens:700}})});
